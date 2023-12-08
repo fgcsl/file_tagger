@@ -1,7 +1,7 @@
 # file_tagger
 
 
-### Usage: run.sh <command> [options]
+#### Usage: run.sh <command> [options]
 
 #### Commands:
 ```
