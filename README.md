@@ -1,20 +1,22 @@
 # file_tagger
 
 
-Usage: run.sh <command> [options]
+### Usage: run.sh <command> [options]
 
-Commands:
+#### Commands:
+```
   add     Add nodes or files
   show    Show node hierarchy
   remove  Remove nodes or files
-
-Options:
+```
+#### Options:
+```
   -n  <c_node>                Specify the child node
   -pl <parent_list_file>      Specify a parent list file
   -p  <p_node>                Specify a parent node
   -f  <file_n>                Specify a file
   -fl <file_list>             Specify a file list
-
+```
 Note: When adding a node, use 'Root' as the parent node for those that don't have any parent. If you don't specify a parent node, it will default to 'Root'.
 
 Example:
