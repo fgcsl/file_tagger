@@ -1,12 +1,12 @@
 # File Tagger Tool
 ### Overview
-The Bioinformatics File Tagger Tool is a command-line interface (CLI) utility designed to simplify file management in bioinformatics labs. This tool addresses the challenge of efficiently locating files within complex directory structures commonly found in server-based environments with extensive datasets.
+The File Tagger Tool is a command-line interface (CLI) utility designed to simplify file management in bioinformatics labs. This tool addresses the challenge of efficiently locating files within complex directory structures commonly found in server-based environments with extensive datasets.
 
 ### Problem Statement
-In bioinformatics labs, server systems often house vast amounts of data organized in numerous directories and subdirectories. Locating specific files without knowing their names can be a daunting task, and traditional methods like the 'locate' command may prove ineffective. Manually traversing directories using the 'cd' command is time-consuming and error-prone.
+In bioinformatics labs, server systems often house vast amounts of data organized in numerous directories and subdirectories. Locating specific files without knowing their names can be a daunting task, and traditional methods like the 'locate' command may prove ineffective. Manually traversing directories using the 'cd' command is time-consuming.
 
 ### Solution
-The Bioinformatics File Tagger Tool provides an effective solution by implementing a hierarchical ontology structure using a MySQL database. Users can create and manage nodes representing categories or themes and associate files with these nodes. This approach streamlines the process of organizing and retrieving files, making it significantly more efficient.
+The File Tagger Tool provides an effective solution by implementing a hierarchical ontology structure using a MySQL database. Users can create and manage nodes representing categories and associate files with these nodes. This approach streamlines the process of organizing and retrieving files, making it significantly more efficient.
 
 ### Key Features
 - Hierarchical Node Structure: Create a hierarchical structure of nodes to represent the organization of files. Nodes can be nested to create a meaningful ontology.
@@ -16,18 +16,25 @@ The Bioinformatics File Tagger Tool provides an effective solution by implementi
 - Command-Line Interface: Access the tool through a user-friendly command-line interface, allowing for quick and efficient interaction.
 
 ### Getting Started
-1. Installation: Clone the repository and install the required dependencies.
-```
-git clone <repository-url>
-cd file-tagger
-# Install dependencies (if any)
+1. Set Up Database:
+
+- Create a new MySQL database.
+- Set a username and password for the database.
+- Edit the init.sql file with your MySQL username and password.
+
+2. Run SQL Script: Execute the SQL script to set up the necessary database structure.
 
 ```
-2. Database Setup: Set up a MySQL database and configure the tool to connect to it.
+mysql -u your_username -p < init.sql>
 ```
-# Update database configuration in config.ini
+
+3. Installation: Clone the repository and install the required dependencies.
 ```
-3. Usage: Run the tool and start organizing your files.
+git clone https://github.com/fgcsl/file_tagger
+cd file-tagger
+```
+
+4. Usage: Run the tool and start organizing your files.
 
 ### Usage Example 
 ```
@@ -83,4 +90,4 @@ Example:
  run.sh remove -pl <file_list> 
 ```
 ```
-``
+
