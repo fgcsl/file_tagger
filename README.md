@@ -37,7 +37,6 @@ cd file-tagger
 4. Usage: Run the tool and start organizing your files.
 
 ### Usage Example 
-```
 #### Usage: run.sh <command> [options]
 
 #### Commands:
@@ -89,5 +88,5 @@ Example:
  run.sh remove -n <file_n>
  run.sh remove -pl <file_list> 
 ```
-```
+
 
