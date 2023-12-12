@@ -37,7 +37,7 @@ cd file-tagger
 4. Usage: Run the tool and start organizing your files.
 
 ### Usage Example 
-#### Usage: run.sh <command> [options]
+#### Usage: tagger.sh <command> [options]
 
 #### Commands:
 ```
@@ -59,34 +59,34 @@ Example:
 
 -Add Nodes
 ```
- $ run.sh add -n <c_node> [-pl <parent_file_list>]
- $ run.sh add -n <c_node> [-p <p_node>]
+ $ tagger.sh add -n <c_node> [-pl <parent_file_list>]
+ $ tagger.sh add -n <c_node> [-p <p_node>]
 ```
 
 -Add files
 ```
- $ run.sh add -f <file_name> [-p <fp_node>]
- $ run.sh add -fl <file_list> -p <parent_node>
- $ run.sh add -f <file_name> -pl <parent_file_list>
- $ run.sh add -fl <file_list> -pl <parent_file_list>
+ $ tagger.sh add -f <file_name> [-p <fp_node>]
+ $ tagger.sh add -fl <file_list> -p <parent_node>
+ $ tagger.sh add -f <file_name> -pl <parent_file_list>
+ $ tagger.sh add -fl <file_list> -pl <parent_file_list>
  ```
 
 -Searching Node Hierarchy
 ```
-  run.sh show -n <node_name>
-  run.sh show -pl <parent_list_file> 
-  run.sh show -f <file_name>		it display the parent node 
-  run.sh info -f <file_name> 		it display the path of the file
+  tagger.sh show -n <node_name>
+  tagger.sh show -pl <parent_list_file> 
+  tagger.sh show -f <file_name>		it display the parent node 
+  tagger.sh info -f <file_name> 		it display the path of the file
 ```
 -Remove files
 ```
-  run.sh remove -f <file_n>
-  run.sh remove -fl <file_list> 
+  tagger.sh remove -f <file_n>
+  tagger.sh remove -fl <file_list> 
 ```
 -Remove nodes
 ```
- run.sh remove -n <file_n>
- run.sh remove -pl <file_list> 
+ tagger.sh remove -n <file_n>
+ tagger.sh remove -pl <file_list> 
 ```
 
 
