@@ -1,12 +1,90 @@
-    #### function is_child_exists() start
+parent_list_check() {
+
+	if [ -f "$ARG5" ]; then 
+		# If $ARG5 is a file, read from the file and store all the list in user_parent_node variable
+		user_parent_node=$(<"$ARG5")
+		#echo "$user_parent_node"	
+	else
+		echo "$ARG5 file not exist"
+		exit 1
+	fi
+ 
+}
+
+file_list_check() {
+
+	 
+	if [ -f "$u_file" ]; then 
+		# If $3 is a file, read from the file
+		
+		user_file=$(<"$u_file")
+		
+		#echo "$user_file"
+	
+		# while loop to read file line by line with tilde
+		while IFS= read -r line; do             
+			#if tilde use in file_list  #because tilde is not read by while loop directly, so added contion here 
+			# if [[ $line == ~* ]]; then
+
+			# eval echo $line is use tp read ~ sign
+			line=$(eval echo "$line");              
+
+			file_path=$(readlink -f "$line"); 
+			#echo "filepath is : $file_path";
+			#echo "$file_path";
+
+			file_name=$(basename "$file_path");
+			#echo "file name is : $file_name";
+			#echo "$file_name";
+			#fi;
+				
+			#if [ ! -f $(readlink -f $(dirname "$3"))/$line ];then		
+			#read line by line and check each file exist at the path
+			if [ ! -f $line ];then
+				echo "[Error: Unable  to insert] $line File Not Found on specified path. Make sure the specified file name or path are correct."	
+				exit 1
+			fi
+			#echo "$line" 
+		done <<< "$user_file";
+
+			
+	else
+		echo "[Error:] $3 File Not Found. Make sure the specified file name or path are correct."
+		exit 1
+	fi
+
+}
+
+user_file_check() {
+
+	
+	if [ -f "$user_file" ]; then
+		#FILE="$(basename "$user_file")"
+		#FILE_PATH=$(echo $PWD/$3) 
+		file_path="$(readlink -f "$user_file")"
+		#echo "file path is : $file_path"
+
+		file_name=$(basename "$file_path");
+		#echo "file name is : $file_name";
+			
+	else
+		echo "[Error:] File Not Found. Make sure specified file name and path are correct."
+		echo "$user_file"
+		exit 1
+	fi
+}
+
+
+
+#### function is_child_exists() start
 
 is_descendant() {
 
         desc_MYSQL_QUERY="WITH RECURSIVE NodeHierarchy AS (
-                SELECT id, c_node, p_node FROM test2_n_n WHERE BINARY p_node = '$PARENT_NODE'
+                SELECT id, c_node, p_node FROM tagger_node_node WHERE BINARY p_node = '$PARENT_NODE'
                 UNION ALL
                 SELECT tn.id, tn.c_node, tn.p_node
-                FROM test2_n_n tn
+                FROM tagger_node_node tn
                 JOIN NodeHierarchy nh ON nh.c_node = tn.p_node 
                 )
                 SELECT * from  NodeHierarchy"
@@ -23,7 +101,7 @@ is_descendant() {
                                     file_is=$(eval echo "$file_is");              # eval echo $file_is is use tp read ~ sign
                                     file_path=$(readlink -f "$file_is");
                                     file_name=$(basename "$file_path");
-                                    search_file_query="select * from test2_f_n where BINARY fp_node='$node' AND file_n='$file_name'"
+                                    search_file_query="select * from tagger_file_node where BINARY fp_node='$node' AND file_n='$file_name'"
                                     $mysql_command -e "$search_file_query"
                                 done <<< "$user_file"
 
@@ -37,10 +115,10 @@ is_descendant() {
 is_ancestor() {
 
     anc_MYSQL_QUERY="WITH RECURSIVE NodeHierarchy AS (                                         
-            SELECT id, c_node, p_node FROM test2_n_n WHERE BINARY c_node = '$PARENT_NODE'                                         
+            SELECT id, c_node, p_node FROM tagger_node_node WHERE BINARY c_node = '$PARENT_NODE'                                         
             UNION ALL
             SELECT tn.id, tn.c_node, tn.p_node
-            FROM test2_n_n tn
+            FROM tagger_node_node tn
             JOIN NodeHierarchy nh ON nh.p_node = tn.c_node
             ) 
             SELECT id, c_node, p_node FROM NodeHierarchy"
@@ -55,10 +133,10 @@ is_ancestor() {
 #Child search in ancestor
 child_search_in_anc_node() {
         
-    desc_MYSQL_QUERY="SELECT id, c_node, p_node FROM test2_n_n WHERE BINARY p_node = '$parent_list' AND c_node='$CHILD_NODE'"
+    desc_MYSQL_QUERY="SELECT id, c_node, p_node FROM tagger_node_node WHERE BINARY p_node = '$parent_list' AND c_node='$CHILD_NODE'"
     $mysql_command -e "$desc_MYSQL_QUERY"
     parent_file_search=$(while IFS= read -r node; do
-                search_file_query="select * from test2_f_n where BINARY fp_node='$node' AND file_n='$file_name'"
+                search_file_query="select * from tagger_file_node where BINARY fp_node='$node' AND file_n='$file_name'"
                 $mysql_command -e "$search_file_query"
             done <<< "$anc_hierarchy_pl")
     
@@ -78,12 +156,12 @@ node_parent_insertion() {
     while IFS= read -r id; do    
         # echo "CHILD NODE : $CHILD_NODE found in decendant hierarchy of Parent Node ancestor with id :$id"
         # remove existing relations with child node and add a new relation
-        remove_relation="DELETE FROM test2_n_n WHERE id='$id'"
+        remove_relation="DELETE FROM tagger_node_node WHERE id='$id'"
         $mysql_command -e "$remove_relation"
         
     done <<< "$delete_from_db"
     
-    insert_new_relation="INSERT IGNORE INTO test2_n_n (p_node, c_node) VALUES ('$PARENT_NODE', '$CHILD_NODE');"
+    insert_new_relation="INSERT IGNORE INTO tagger_node_node (p_node, c_node) VALUES ('$PARENT_NODE', '$CHILD_NODE');"
     $mysql_command -e "$insert_new_relation"
 
 
@@ -109,26 +187,26 @@ file_node_insertion() {
         #echo "file nanme is : $file_name";
         #echo "$anc_hierarchy_pl"
         parent_file_search=$(while IFS= read -r node; do
-                        search_file_query="select * from test2_f_n where BINARY fp_node='$node' AND file_n='$file_name'"
+                        search_file_query="select * from tagger_file_node where BINARY fp_node='$node' AND file_n='$file_name'"
                         $mysql_command -e "$search_file_query"
                 done <<< "$anc_hierarchy_pl")
 
         delete_from_f_n="$(echo "$parent_file_search"| awk '!seen[$1]++ {print $1}')"
         #echo "delete_from_f_n : $delete_from_f_n"
 
-        remove_relation1="DELETE FROM test2_f_n  WHERE test2_f_n.file_path_id='$delete_from_f_n'"
-        remove_relation2="DELETE FROM test2_file_info WHERE test2_file_info.file_path_id='$delete_from_f_n'"
+        remove_relation1="DELETE FROM tagger_file_node  WHERE tagger_file_node.file_path_id='$delete_from_f_n'"
+        remove_relation2="DELETE FROM tagger_file_info WHERE tagger_file_info.file_path_id='$delete_from_f_n'"
         $mysql_command -e "$remove_relation1"; 
         $mysql_command -e "$remove_relation2";
 
-        insert_new_relation="INSERT IGNORE INTO test2_file_info (file_name, system_path)
+        insert_new_relation="INSERT IGNORE INTO tagger_file_info (file_name, system_path)
         VALUES ('$file_name', '$file_path') ON DUPLICATE KEY UPDATE file_path_id = LAST_INSERT_ID(file_path_id);
 
         -- Get the auto-generated file_path_id from the first insert
         SET @last_file_path_id = LAST_INSERT_ID();
 
-        -- Insert data into test2_f_n, using the obtained file_path_id
-        INSERT IGNORE INTO test2_f_n (file_path_id, file_n, fp_node)
+        -- Insert data into tagger_file_node, using the obtained file_path_id
+        INSERT IGNORE INTO tagger_file_node (file_path_id, file_n, fp_node)
         VALUES (@last_file_path_id, '$file_name', '$PARENT_NODE');"
 
         $mysql_command -e "$insert_new_relation"
@@ -206,35 +284,35 @@ is_descen_ances() {
 
 remove_node_relation() {
     #step1: Display the relation of deleting node 
-    node_joins="SELECT * FROM test2_n_n WHERE BINARY c_node = '$CHILD_NODE' OR  p_node ='$CHILD_NODE';"
+    node_joins="SELECT * FROM tagger_node_node WHERE BINARY c_node = '$CHILD_NODE' OR  p_node ='$CHILD_NODE';"
     #echo "delete below relation"
     #$mysql_path -u "$DB_USER" -D "$DB_NAME" -e "$node_joins"
 
     #step2: Display the parent nodes of new relation
    # echo "new relation with below parent"
-    add_parent="SELECT p_node FROM test2_n_n WHERE BINARY c_node ='$CHILD_NODE';"
+    add_parent="SELECT p_node FROM tagger_node_node WHERE BINARY c_node ='$CHILD_NODE';"
     parent_nodes=$($mysql_path -s -u "$DB_USER" -D "$DB_NAME" -e "$add_parent")
     #run sql query 
     #echo "$parent_nodes"
 
     #step3: Display the child nodes of new relation  
     #echo "new relation with below child"
-    add_child="SELECT c_node FROM test2_n_n WHERE BINARY p_node ='$CHILD_NODE';"
+    add_child="SELECT c_node FROM tagger_node_node WHERE BINARY p_node ='$CHILD_NODE';"
     child_node=$($mysql_path -s -u "$DB_USER" -D "$DB_NAME" -e "$add_child")
     #run sql query 
     #echo "$child_node"
 
     #step4: Remove the relation
-    remove_n_n="DELETE FROM test2_n_n  WHERE BINARY c_node = '$CHILD_NODE' OR  p_node ='$CHILD_NODE';"
+    remove_n_n="DELETE FROM tagger_node_node  WHERE BINARY c_node = '$CHILD_NODE' OR  p_node ='$CHILD_NODE';"
     $mysql_path -u "$DB_USER" -D "$DB_NAME" -e "$remove_n_n"
 
     #step6: if node contains file, remove node from file relation and info table
-    get_id="SELECT file_path_id FROM test2_f_n WHERE BINARY fp_node='$CHILD_NODE'"
+    get_id="SELECT file_path_id FROM tagger_file_node WHERE BINARY fp_node='$CHILD_NODE'"
     remove_f_n_id=$($mysql_path -s -u "$DB_USER" -D "$DB_NAME" -e "$get_id")
 
     while IFS= read -r rm_id; do
-        remove_f_n="DELETE FROM test2_f_n WHERE BINARY file_path_id='$rm_id'"
-        remove_info="DELETE FROM test2_file_info WHERE BINARY file_path_id='$rm_id'"
+        remove_f_n="DELETE FROM tagger_file_node WHERE BINARY file_path_id='$rm_id'"
+        remove_info="DELETE FROM tagger_file_info WHERE BINARY file_path_id='$rm_id'"
         $mysql_path -u "$DB_USER" -D "$DB_NAME" -e "$remove_f_n"
         $mysql_path -u "$DB_USER" -D "$DB_NAME" -e "$remove_info"
     done <<< "$remove_f_n_id"
@@ -249,7 +327,7 @@ remove_node_relation() {
         echo "Child_node parent_node"
         while IFS= read -r pn; do
             while IFS= read -r cn; do
-                insert_new_rel="INSERT IGNORE INTO test2_n_n (p_node, c_node) VALUES ('$pn', '$cn');"
+                insert_new_rel="INSERT IGNORE INTO tagger_node_node (p_node, c_node) VALUES ('$pn', '$cn');"
                 $mysql_path -s -u "$DB_USER" -D "$DB_NAME" -e "$insert_new_rel"	
                 echo "$cn		$pn"
             done <<< "$child_node"
@@ -264,8 +342,8 @@ remove_node_relation() {
 remove_files(){
     	
         # Delete file query
-		remove_fp_relation="DELETE FROM test2_f_n WHERE BINARY file_n='$only_file';"
-		remove_file_info="DELETE FROM test2_file_info WHERE BINARY file_name='$only_file';"
+		remove_fp_relation="DELETE FROM tagger_file_node WHERE BINARY file_n='$only_file';"
+		remove_file_info="DELETE FROM tagger_file_info WHERE BINARY file_name='$only_file';"
 
 		# Execute the query			
 		$mysql_path -u "$DB_USER" -D "$DB_NAME" -e "$remove_fp_relation"
@@ -300,10 +378,10 @@ sql_recursive_query() {
 searching_nodes_hierarchy() {
 
 MYSQL_QUERY="WITH RECURSIVE NodeHierarchy AS (
-        SELECT p_node, c_node FROM test2_n_n WHERE BINARY p_node = '$NODE'
+        SELECT p_node, c_node FROM tagger_node_node WHERE BINARY p_node = '$NODE'
         UNION ALL
         SELECT tn.p_node, tn.c_node
-        FROM test2_n_n tn
+        FROM tagger_node_node tn
         JOIN NodeHierarchy nh ON tn.p_node = nh.c_node
         )
         SELECT DISTINCT p_node AS result FROM NodeHierarchy
@@ -318,14 +396,14 @@ sql_recursive_query "$error_message"
 Search_node_get_files() {
 
 MYSQL_QUERY="WITH RECURSIVE NodeHierarchy AS (
-            SELECT p_node, c_node FROM test2_n_n WHERE BINARY p_node = '$NODE'
+            SELECT p_node, c_node FROM tagger_node_node WHERE BINARY p_node = '$NODE'
             UNION ALL
             SELECT tn.p_node, tn.c_node
-            FROM test2_n_n tn
+            FROM tagger_node_node tn
             JOIN NodeHierarchy nh ON tn.p_node = nh.c_node
             )
             -- search all the previous results
-            SELECT t1.file_n, t2.system_path FROM test2_f_n as t1 INNER JOIN test2_file_info as t2 on t1.file_n=t2.file_name WHERE fp_node IN (
+            SELECT t1.file_n, t2.system_path FROM tagger_file_node as t1 INNER JOIN tagger_file_info as t2 on t1.file_n=t2.file_name WHERE fp_node IN (
             SELECT result FROM (
                 SELECT DISTINCT p_node AS result FROM NodeHierarchy
                 UNION
@@ -391,6 +469,4 @@ extract_common() {
         echo "No Intesection $(basename $2) found between searching nodes"
     fi
 }
-
-
 
