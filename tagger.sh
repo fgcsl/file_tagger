@@ -71,98 +71,9 @@ usage() {
 }
 
 
-
-#insert_error() {
-
-	#if [ $? -eq 0 ]; then
-	#echo "Data inserted successfully!"
-	#else
-	#echo "[Error:] Unable to insert data."
-	#exit 1
-	#fi
-#}
-
 # Common MySQL command parameters
 mysql_command="$mysql_path -s -u $DB_USER -h $DB_HOST -D $DB_NAME"
 
-
-#if []
-
-parent_list_check() {
-
-	if [ -f "$ARG5" ]; then 
-		# If $ARG5 is a file, read from the file and store all the list in user_parent_node variable
-		user_parent_node=$(<"$ARG5")
-		#echo "$user_parent_node"	
-	else
-		echo "$ARG5 file not exist"
-		exit 1
-	fi
- 
-}
-
-file_list_check() {
-
-	 
-	if [ -f "$u_file" ]; then 
-		# If $3 is a file, read from the file
-		
-		user_file=$(<"$u_file")
-		
-		#echo "$user_file"
-	
-		# while loop to read file line by line with tilde
-		while IFS= read -r line; do             
-			#if tilde use in file_list  #because tilde is not read by while loop directly, so added contion here 
-			# if [[ $line == ~* ]]; then
-
-			# eval echo $line is use tp read ~ sign
-			line=$(eval echo "$line");              
-
-			file_path=$(readlink -f "$line"); 
-			#echo "filepath is : $file_path";
-			#echo "$file_path";
-
-			file_name=$(basename "$file_path");
-			#echo "file name is : $file_name";
-			#echo "$file_name";
-			#fi;
-				
-			#if [ ! -f $(readlink -f $(dirname "$3"))/$line ];then		
-			#read line by line and check each file exist at the path
-			if [ ! -f $line ];then
-				echo "[Error: Unable  to insert] $line File Not Found on specified path. Make sure the specified file name or path are correct."	
-				exit 1
-			fi
-			#echo "$line" 
-		done <<< "$user_file";
-
-			
-	else
-		echo "[Error:] $3 File Not Found. Make sure the specified file name or path are correct."
-		exit 1
-	fi
-
-}
-
-user_file_check() {
-
-	
-	if [ -f "$user_file" ]; then
-		#FILE="$(basename "$user_file")"
-		#FILE_PATH=$(echo $PWD/$3) 
-		file_path="$(readlink -f "$user_file")"
-		#echo "file path is : $file_path"
-
-		file_name=$(basename "$file_path");
-		#echo "file name is : $file_name";
-			
-	else
-		echo "[Error:] File Not Found. Make sure specified file name and path are correct."
-		echo "$user_file"
-		exit 1
-	fi
-}
 
 # Parse command-line arguments for adding nodes 
 
@@ -223,7 +134,7 @@ if [[ "$1" == "add" && ( "$2" == "-n" || "$2" == "-f" || "$2" == "-fl" ) && -n "
 	while IFS= read -r PARENT_NODE; do
 					
 		# echo "$PARENT_NODE"
-		check_parent="SELECT c_node, p_node FROM test2_n_n WHERE c_node='$PARENT_NODE' or p_node='$PARENT_NODE';"
+		check_parent="SELECT c_node, p_node FROM tagger_node_node WHERE c_node='$PARENT_NODE' or p_node='$PARENT_NODE';"
 		parent_check=$($mysql_command -e "$check_parent")
 
 		#echo "this is PN that is avalable in db: $parent_check" 
@@ -241,10 +152,10 @@ if [[ "$1" == "add" && ( "$2" == "-n" || "$2" == "-f" || "$2" == "-fl" ) && -n "
 	
 			#echo "This is parent node check (parent node not found in the database, it adds with root node)"
 			#if parent not exists in database then create parent as Root and insert parent node in child_node column of n_n table
-			parent_insert_with_root="INSERT IGNORE INTO test2_n_n (p_node, c_node) VALUES ('Root','$PARENT_NODE');"
+			parent_insert_with_root="INSERT IGNORE INTO tagger_node_node (p_node, c_node) VALUES ('Root','$PARENT_NODE');"
 			
 			$mysql_command -e "$parent_insert_with_root"
-			remove_doubleroot="delete from test2_n_n where c_node='Root' and c_node='Root'"
+			remove_doubleroot="delete from tagger_node_node where c_node='Root' and c_node='Root'"
 			$mysql_command -e "$remove_doubleroot"
 			
 			#echo "[Warning:] Parent node $PARENT_NODE not found in the database, so it will add with Root node";
@@ -339,8 +250,8 @@ elif [[ "$1" == "show" && ( "$2" == "-n" || "$2" == "-pl" || "$2" == "-f" ) && -
 	#To display the parent node for searched file 
 	elif [[ "$2" == "-f" ]]; then
 		searching_file="$3"
-		#MYSQL_QUERY="SELECT fp_node as 'parent node for searching file' FROM test2_f_n WHERE file_n='$searching_file';"
-        MYSQL_QUERY="SELECT t1.fp_node as 'parent node for searching file', t2.system_path as 'system_path' FROM test2_f_n as t1 JOIN test2_file_info as t2 ON t1.file_path_id=t2.file_path_id WHERE t1.file_n='$searching_file';"
+		#MYSQL_QUERY="SELECT fp_node as 'parent node for searching file' FROM tagger_file_node WHERE file_n='$searching_file';"
+        MYSQL_QUERY="SELECT t1.fp_node as 'parent node for searching file', t2.system_path as 'system_path' FROM tagger_file_node as t1 JOIN tagger_file_info as t2 ON t1.file_path_id=t2.file_path_id WHERE t1.file_n='$searching_file';"
 		#$mysql_command -u "$DB_USER" -D "$DB_NAME" -e "$MYSQL_QUERY"
         #get parent node of the searching file
         parent_node=$($mysql_command -u "$DB_USER" -D "$DB_NAME" -e "$MYSQL_QUERY")
@@ -414,7 +325,7 @@ elif [[ "$1" == "info" && "$2" == "-f" && -n "$3" ]]; then
 
 	searching_file="$3"
 	
-	file_information="SELECT system_path as 'file path information' FROM test2_file_info WHERE file_name='$searching_file';"
+	file_information="SELECT system_path as 'file path information' FROM tagger_file_info WHERE file_name='$searching_file';"
 	info=$($mysql_command -e "$file_information")
 	if [ -z "$info" ]; then
 		echo "file not exists"
