@@ -1,17 +1,12 @@
 #!/bin/bash
 
 source "function.sh"
+source "conn.sh"
 
 # Initialize variables
 PARENT_NODE="Root"
 
-mysql_path="mysql"
 
-# Define MySQL connection parameters
-DB_HOST="$extract_ip"
-DB_NAME="sbl_infra_db"
-DB_USER="db_user"
-#DB_PASS="db_password"
 
 
 # Function to display usage
