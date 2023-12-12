@@ -73,20 +73,20 @@ Example:
 
 -Searching Node Hierarchy
 ```
-  tagger.sh show -n <node_name>
-  tagger.sh show -pl <parent_list_file> 
-  tagger.sh show -f <file_name>		it display the parent node 
-  tagger.sh info -f <file_name> 		it display the path of the file
+  $ tagger.sh show -n <node_name>
+  $ tagger.sh show -pl <parent_list_file> 
+  $ tagger.sh show -f <file_name>		it display the parent node 
+  $ tagger.sh info -f <file_name> 		it display the path of the file
 ```
 -Remove files
 ```
-  tagger.sh remove -f <file_n>
-  tagger.sh remove -fl <file_list> 
+  $ tagger.sh remove -f <file_n>
+  $ tagger.sh remove -fl <file_list> 
 ```
 -Remove nodes
 ```
- tagger.sh remove -n <file_n>
- tagger.sh remove -pl <file_list> 
+ $ tagger.sh remove -n <file_n>
+ $ tagger.sh remove -pl <file_list> 
 ```
 
 
