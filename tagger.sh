@@ -6,9 +6,6 @@ source "conn.sh"
 # Initialize variables
 PARENT_NODE="Root"
 
-
-
-
 # Function to display usage
 usage() {
 
