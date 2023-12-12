@@ -15,21 +15,13 @@ The File Tagger Tool provides an effective solution by implementing a hierarchic
 
 - Command-Line Interface: Access the tool through a user-friendly command-line interface, allowing for quick and efficient interaction.
 
-### Prerequisites
-Before running the script, ensure that you have the following:
-
-- MySQL server installed and running.
-- Correct MySQL username and password.
-
-
-
 ### Getting Started
 1. Set Up Database:
-
+- Install MySQL Database
 - Create a new MySQL database.
 - Set a username and password for the database.
 - Edit the init.sql and conn.sh file with your MySQL username and password.
-- open the ~/.my.cnf file in a text editor, Replace `<db_user>` and `<db_password>` with your actual MySQL database username and password.
+- Create and edit ~/.my.cnf file in home directory.
 
 2. Run SQL Script: Execute the SQL script to set up the necessary database structure.
 
@@ -97,5 +89,3 @@ Example:
  $ tagger.sh remove -n <file_n>
  $ tagger.sh remove -pl <file_list> 
 ```
-
-
