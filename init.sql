@@ -1,10 +1,10 @@
 -- init.sql
 
 -- Create the database
-CREATE DATABASE IF NOT EXISTS sbl_infra_db;
+CREATE DATABASE IF NOT EXISTS <database_name>;
 
 -- Switch to the created database
-USE sbl_infra_db;
+USE <database_name>;
 
 -- Create the second table file information (path of the file)
 CREATE TABLE IF NOT EXISTS test2_file_info (
