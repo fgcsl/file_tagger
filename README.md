@@ -20,7 +20,8 @@ The File Tagger Tool provides an effective solution by implementing a hierarchic
 
 - Create a new MySQL database.
 - Set a username and password for the database.
-- Edit the init.sql file with your MySQL username and password.
+- Edit the init.sql and conn.sh file with your MySQL username and password.
+- Create and edit ~/.my.cnf file 
 
 2. Run SQL Script: Execute the SQL script to set up the necessary database structure.
 
